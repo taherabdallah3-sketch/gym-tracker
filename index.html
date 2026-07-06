@@ -36,7 +36,7 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--iron);color:var(--chalk);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
-  #app{max-width:640px;margin:0 auto;padding:20px 16px 80px;min-height:100vh;}
+  #app{max-width:640px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 16px 80px;min-height:100vh;}
 
   .brand{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;}
   .brand h1{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1.5px;margin:0;line-height:1;}
@@ -74,6 +74,8 @@
   .sched-sub{font-size:11px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:14px 0 6px;}
   .sched-search{width:100%;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:8px;padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;margin-bottom:6px;}
   .sched-search:focus{outline:none;border-color:var(--fire);}
+  .rest-day-toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;background:var(--plate-2);border:1px solid var(--line);border-radius:8px;padding:10px;cursor:pointer;margin-top:10px;}
+  .rest-day-toggle input{accent-color:var(--fire);width:16px;height:16px;}
   .sched-list{max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;padding:4px 8px;}
   .sched-item{display:flex;align-items:center;gap:8px;padding:7px 2px;font-size:13.5px;border-bottom:1px solid var(--line);cursor:pointer;}
   .sched-item:last-child{border-bottom:none;}
@@ -569,11 +571,17 @@ const DAY_ORDER=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 function ensureDay(day){
   if(!state.schedule) state.schedule={days:{}};
-  if(!state.schedule.days[day]) state.schedule.days[day]={label:'', exercises:[], meals:[]};
+  if(!state.schedule.days[day]) state.schedule.days[day]={label:'', exercises:[], meals:[], restDay:false};
+  if(state.schedule.days[day].restDay===undefined) state.schedule.days[day].restDay=false;
   return state.schedule.days[day];
 }
 function getDaySchedule(day){
   return (state.schedule && state.schedule.days[day]) || null;
+}
+function toggleRestDay(day){
+  const d=ensureDay(day);
+  d.restDay = !d.restDay;
+  saveState(); render();
 }
 function toggleScheduleExercise(day, exId){
   const d=ensureDay(day);
@@ -601,7 +609,7 @@ function renderToday(){
   const log=getLog(ds);
   const dayKey = DAY_KEYS[viewDate.getDay()];
   const sched = getDaySchedule(dayKey);
-  const exList = sched ? state.exercises.filter(e=>sched.exercises.includes(e.id)) : state.exercises;
+  const exList = sched ? (sched.restDay ? [] : state.exercises.filter(e=>sched.exercises.includes(e.id))) : state.exercises;
   const mealList = sched ? state.meals.filter(m=>sched.meals.includes(m.id)) : state.meals;
 
   let exCards = exList.map(ex=>{
@@ -626,7 +634,7 @@ function renderToday(){
       </div>
       <div class="last-time">${lastLine}</div>
     </div>`;
-  }).join('') || (sched ? `<div class="empty">${sched.label || 'Rest day'} — nothing scheduled. Edit this in the Schedule tab.</div>` : `<div class="empty">No exercises yet — tap "+ Add" to build your training list.</div>`);
+  }).join('') || (sched && sched.restDay ? `<div class="empty">🛌 Rest day — no training today.</div>` : sched ? `<div class="empty">${sched.label || 'Nothing scheduled'} — nothing scheduled. Edit this in the Schedule tab.</div>` : `<div class="empty">No exercises yet — tap "+ Add" to build your training list.</div>`);
 
   let mealCards = mealList.map(m=>{
     const on = !!log.meals[m.id];
@@ -643,7 +651,7 @@ function renderToday(){
   }).join('') || (sched ? `<div class="empty">No meals scheduled for this day.</div>` : `<div class="empty">No meals yet — tap "+ Add" to log what you eat.</div>`);
 
   return `
-    ${sched && sched.label ? `<div class="day-label-banner">${dayKey} — ${sched.label}</div>` : ''}
+    ${sched && (sched.label || sched.restDay) ? `<div class="day-label-banner">${dayKey} — ${sched.restDay ? 'Rest Day 🛌' : sched.label}</div>` : ''}
     <div class="section-title">Training <button class="add-btn" onclick="openAddExerciseModal()">+ Add</button></div>
     ${exCards}
     <div class="section-title">Meals <button class="add-btn" onclick="openAddMealModal()">+ Add</button></div>
@@ -670,15 +678,18 @@ function renderSchedule(){
       return `<label class="sched-item" data-search="${escAttr(searchBlob)}"><input type="checkbox" ${d&&d.meals.includes(m.id)?'checked':''} onchange="toggleScheduleMeal('${day}','${m.id}')"> ${m.name}</label>`;
     }).join('') || `<div class="empty" style="padding:10px;">No meals yet</div>`;
 
-    const summaryText = d ? (d.label || `${d.exercises.length} exercise${d.exercises.length===1?'':'s'}`) : 'Not set — full list shown';
+    const summaryText = d ? (d.restDay ? 'Rest Day 🛌' : (d.label || `${d.exercises.length} exercise${d.exercises.length===1?'':'s'}`)) : 'Not set — full list shown';
+    const exSection = (d && d.restDay) ? `<div class="empty" style="padding:10px;">Rest day — no exercises. Untick "Rest Day" above to pick some.</div>` : `
+        <input class="sched-search" type="text" placeholder="Search exercises…" value="${escAttr(exTerm)}" oninput="onSchedSearchInput(this,'${day}','ex')">
+        <div class="sched-list">${exChecks}</div>`;
     return `<details class="sched-day" ${openScheduleDays.has(day)?'open':''} ontoggle="onScheduleDayToggle('${day}', this.open)">
       <summary><span class="sday">${day}</span><span class="slabel">${summaryText}</span></summary>
       <div class="sched-body">
+        <label class="rest-day-toggle"><input type="checkbox" ${d&&d.restDay?'checked':''} onchange="toggleRestDay('${day}')"> 🛌 Mark as Rest Day (no training)</label>
         <label style="font-size:11px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.5px;display:block;margin:10px 0 5px;">Day label (optional)</label>
         <input class="sched-label-input" value="${escAttr(d&&d.label?d.label:'')}" placeholder="e.g. Push Day, Rest Day" onchange="updateDayLabel('${day}', this.value)">
         <div class="sched-sub">Exercises</div>
-        <input class="sched-search" type="text" placeholder="Search exercises…" value="${escAttr(exTerm)}" oninput="onSchedSearchInput(this,'${day}','ex')">
-        <div class="sched-list">${exChecks}</div>
+        ${exSection}
         <div class="sched-sub">Meals</div>
         <input class="sched-search" type="text" placeholder="Search meals…" value="${escAttr(mealTerm)}" oninput="onSchedSearchInput(this,'${day}','meal')">
         <div class="sched-list">${mealChecks}</div>
@@ -762,7 +773,7 @@ function render(){
       <div class="date-nav">
         <button onclick="shiftDate(-1)">‹</button>
         <div class="dlabel">${humanDate(ds)}</div>
-        <button onclick="shiftDate(1)" ${ds>=todayStr()?'disabled style="opacity:.3"':''}>›</button>
+        <button onclick="shiftDate(1)">›</button>
         <button class="gear-btn" onclick="forceRefresh()" title="Refresh (get latest version)">⟳</button>
         <button class="gear-btn" onclick="openManageModal()" title="Manage exercises & meals">⚙</button>
       </div>
