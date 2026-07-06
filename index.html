@@ -203,7 +203,7 @@ const DEFAULT_MEALS=[
 
 async function loadState(){
   try{
-    const res = await window.storage.get(KEY, false);
+    const res = await storageGet(KEY);
     if(res && res.value){ state = JSON.parse(res.value); }
   }catch(e){ /* no saved data yet */ }
   if(!state.exercises || state.exercises.length===0){
@@ -216,6 +216,26 @@ async function loadState(){
   }
   render();
 }
+const HAS_CLAUDE_STORAGE = (typeof window.storage !== 'undefined') && window.storage && typeof window.storage.get === 'function';
+async function storageGet(key){
+  if(HAS_CLAUDE_STORAGE){
+    try{ return await window.storage.get(key, false); }
+    catch(e){ return null; }
+  }
+  try{
+    const v = localStorage.getItem(key);
+    return v ? {key, value:v, shared:false} : null;
+  }catch(e){ return null; }
+}
+async function storageSet(key, value){
+  if(HAS_CLAUDE_STORAGE){
+    try{ return await window.storage.set(key, value, false); }
+    catch(e){ return null; }
+  }
+  try{ localStorage.setItem(key, value); return {key, value, shared:false}; }
+  catch(e){ return null; }
+}
+
 let saveInFlight=false;
 let savePending=false;
 function saveState(){
@@ -229,7 +249,7 @@ async function doSave(){
   let ok=false;
   for(let attempt=0; attempt<3 && !ok; attempt++){
     try{
-      const res = await window.storage.set(KEY, payload, false);
+      const res = await storageSet(KEY, payload);
       if(res) ok=true;
     }catch(e){
       console.error('save attempt failed', attempt+1, e);
