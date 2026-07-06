@@ -540,6 +540,11 @@ function shiftDate(n){
 
 function switchTab(t){ currentTab=t; render(); }
 
+function forceRefresh(){
+  const url = location.pathname + '?r=' + Date.now();
+  location.href = url;
+}
+
 function renderStreaks(){
   const tStreak=computeStreak('training');
   const mStreak=computeStreak('meals');
@@ -758,6 +763,7 @@ function render(){
         <button onclick="shiftDate(-1)">‹</button>
         <div class="dlabel">${humanDate(ds)}</div>
         <button onclick="shiftDate(1)" ${ds>=todayStr()?'disabled style="opacity:.3"':''}>›</button>
+        <button class="gear-btn" onclick="forceRefresh()" title="Refresh (get latest version)">⟳</button>
         <button class="gear-btn" onclick="openManageModal()" title="Manage exercises & meals">⚙</button>
       </div>
     </div>
