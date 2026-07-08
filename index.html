@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>IronLog</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -36,7 +37,7 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--iron);color:var(--chalk);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
-  #app{max-width:640px;margin:0 auto;padding:22px 16px 90px;min-height:100vh;}
+  #app{max-width:640px;margin:0 auto;padding:calc(env(safe-area-inset-top, 0px) + 32px) 16px 90px;min-height:100vh;}
 
   .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
   .brand h1{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:1.5px;margin:0;line-height:1;}
@@ -81,8 +82,8 @@
   .sched-day .sday{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;color:var(--fire);min-width:44px;}
   .sched-day .slabel{font-size:12.5px;color:var(--chalk-dim);}
   .sched-body{padding:0 14px 16px;border-top:1px solid var(--line);}
-  .sched-label-input{width:100%;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:9px;font-size:13.5px;font-family:'Inter',sans-serif;}
-  .sched-search{width:100%;background:var(--iron);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:8px 11px;font-size:13px;font-family:'Inter',sans-serif;margin-bottom:6px;transition:border-color .15s;}
+  .sched-label-input{width:100%;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:9px;font-size:16px;font-family:'Inter',sans-serif;}
+  .sched-search{width:100%;background:var(--iron);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:8px 11px;font-size:16px;font-family:'Inter',sans-serif;margin-bottom:6px;transition:border-color .15s;}
   .sched-search:focus{outline:none;border-color:var(--fire);}
   .sched-search::placeholder{color:var(--chalk-dim);}
   .sched-sub{font-size:11px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:14px 0 6px;}
@@ -112,7 +113,7 @@
   .set-chip .x{cursor:pointer;color:var(--chalk-dim);display:inline-flex;align-items:center;transition:color .15s;}
   .set-chip .x:hover{color:var(--fire);}
   .add-set{display:flex;gap:7px;margin-top:11px;}
-  .add-set input{width:68px;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:9px 10px;font-size:13px;font-family:'JetBrains Mono',monospace;transition:border-color .15s;}
+  .add-set input{width:68px;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:9px 10px;font-size:16px;font-family:'JetBrains Mono',monospace;transition:border-color .15s;}
   .add-set input:focus{outline:none;border-color:var(--fire);}
   .add-set button{background:var(--fire);color:#181818;border:none;border-radius:9px;padding:9px 14px;font-weight:700;font-size:12.5px;cursor:pointer;transition:filter .15s, transform .1s;}
   .add-set button:hover{filter:brightness(1.08);}
@@ -142,7 +143,7 @@
   .modal{background:var(--plate);border:1px solid var(--line);border-radius:18px 18px 0 0;padding:22px;width:100%;max-width:640px;box-shadow:0 -8px 30px rgba(0,0,0,.4);}
   .modal h3{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:20px;margin:0 0 12px;}
   .modal label{font-size:11px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;margin-top:12px;}
-  .modal input, .modal select{width:100%;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:10px;font-size:14px;font-family:'Inter',sans-serif;transition:border-color .15s;}
+  .modal input, .modal select{width:100%;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:10px;font-size:16px;font-family:'Inter',sans-serif;transition:border-color .15s;}
   .modal input:focus{outline:none;border-color:var(--fire);}
   .modal-actions{display:flex;gap:8px;margin-top:18px;}
   .modal-actions button{flex:1;padding:12px;border-radius:10px;border:none;font-weight:700;cursor:pointer;font-size:13.5px;transition:filter .15s, transform .1s;}
@@ -165,7 +166,7 @@
   .rest-setting-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--fire);min-width:80px;text-align:center;letter-spacing:.5px;}
   .rest-setting-val span{display:block;font-family:'Inter',sans-serif;font-size:10px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:2px;}
 
-  .prog-select{width:100%;background:var(--plate);border:1px solid var(--line);color:var(--chalk);padding:11px;border-radius:10px;font-size:14px;margin-bottom:14px;}
+  .prog-select{width:100%;background:var(--plate);border:1px solid var(--line);color:var(--chalk);padding:11px;border-radius:10px;font-size:16px;margin-bottom:14px;}
   .hist-row{display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);font-size:13px;}
   .hist-row:last-child{border-bottom:none;}
   .hist-date{color:var(--chalk-dim);font-family:'JetBrains Mono',monospace;font-size:12px;}
@@ -175,6 +176,23 @@
   .loading{text-align:center;padding:60px 0;color:var(--chalk-dim);font-family:'JetBrains Mono',monospace;font-size:13px;}
   .fab-hint{text-align:center;color:var(--chalk-dim);font-size:11.5px;margin-top:28px;line-height:1.6;}
   .build-tag{text-align:center;color:var(--line);font-size:10px;margin-top:14px;font-family:'JetBrains Mono',monospace;}
+
+  .auth-wrap{max-width:400px;margin:0 auto;padding-top:calc(env(safe-area-inset-top, 0px) + 14vh);text-align:center;}
+  .auth-brand{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:1.5px;margin:0 0 28px;}
+  .auth-brand span{color:var(--fire);}
+  .auth-card{background:var(--plate);border:1px solid var(--line);border-radius:16px;padding:22px;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,.25);}
+  .auth-tabs{display:flex;gap:5px;margin-bottom:18px;background:var(--plate-2);padding:4px;border-radius:10px;}
+  .auth-tab{flex:1;text-align:center;padding:9px 0;border-radius:8px;font-size:13px;font-weight:700;color:var(--chalk-dim);cursor:pointer;transition:background .15s, color .15s;}
+  .auth-tab.active{background:var(--fire);color:#181818;}
+  .auth-card label{font-size:11px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;margin-top:14px;}
+  .auth-card input{width:100%;background:var(--plate-2);border:1px solid var(--line);color:var(--chalk);border-radius:9px;padding:11px;font-size:16px;font-family:'Inter',sans-serif;}
+  .auth-card input:focus{outline:none;border-color:var(--fire);}
+  .auth-error{color:#ff9080;font-size:12.5px;margin-top:12px;line-height:1.5;}
+  .auth-submit{width:100%;margin-top:20px;padding:13px;}
+  .user-chip{display:flex;align-items:center;justify-content:space-between;background:var(--plate-2);border:1px solid var(--line);border-radius:10px;padding:10px 13px;margin-bottom:16px;font-size:12.5px;}
+  .user-chip .email{color:var(--chalk-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .user-chip button{background:none;border:1px solid var(--line);color:var(--chalk-dim);border-radius:7px;padding:5px 11px;font-size:11.5px;cursor:pointer;font-weight:700;flex-shrink:0;}
+  .user-chip button:hover{border-color:var(--fire);color:var(--fire);}
 </style>
 </head>
 <body>
@@ -254,25 +272,33 @@ const DEFAULT_MEALS=[
 
 const HAS_CLAUDE_STORAGE = (typeof window.storage !== 'undefined') && window.storage && typeof window.storage.get === 'function';
 
-// Cloud sync (Supabase) — keeps data safe across devices / browser clears.
+// Cloud sync + accounts (Supabase) — each person who logs in gets their own private data.
 // Only used when NOT running inside the Claude artifact preview (which has its own storage).
 const SUPABASE_URL = 'https://bbnvxzyxpdpnsuumrtst.supabase.co';
 const SUPABASE_ANON_KEY = 'PASTE_YOUR_FULL_ANON_PUBLIC_KEY_HERE';
-const SUPABASE_ROW_ID = 'taher-gym-data';
-const USE_SUPABASE = !HAS_CLAUDE_STORAGE;
+const USE_SUPABASE = !HAS_CLAUDE_STORAGE && SUPABASE_URL && !SUPABASE_ANON_KEY.startsWith('PASTE_');
 let cloudSyncStatus = 'idle'; // idle | ok | error
+let supabaseClient = null;
+let currentUser = null;
+let authError = '';
+let authMode = 'login'; // 'login' | 'signup'
+let authBusy = false;
+
+if(USE_SUPABASE && window.supabase){
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
 
 async function supabaseGetState(){
-  if(!USE_SUPABASE) return null;
+  if(!supabaseClient || !currentUser) return null;
   try{
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/gym_tracker_data?id=eq.${SUPABASE_ROW_ID}&select=value`, {
-      headers:{ apikey:SUPABASE_ANON_KEY, Authorization:`Bearer ${SUPABASE_ANON_KEY}` }
-    });
-    if(!res.ok) throw new Error('bad response '+res.status);
-    const rows = await res.json();
+    const { data, error } = await supabaseClient
+      .from('gym_tracker_data')
+      .select('value')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+    if(error) throw error;
     cloudSyncStatus = 'ok';
-    if(rows && rows.length) return rows[0].value;
-    return null;
+    return data ? data.value : null;
   }catch(e){
     cloudSyncStatus = 'error';
     console.error('supabase get failed', e);
@@ -280,19 +306,12 @@ async function supabaseGetState(){
   }
 }
 async function supabaseSetState(value){
-  if(!USE_SUPABASE) return false;
+  if(!supabaseClient || !currentUser) return false;
   try{
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/gym_tracker_data`, {
-      method:'POST',
-      headers:{
-        apikey:SUPABASE_ANON_KEY,
-        Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type':'application/json',
-        Prefer:'resolution=merge-duplicates,return=minimal'
-      },
-      body: JSON.stringify([{id:SUPABASE_ROW_ID, value:value, updated_at:new Date().toISOString()}])
-    });
-    if(!res.ok) throw new Error('bad response '+res.status);
+    const { error } = await supabaseClient
+      .from('gym_tracker_data')
+      .upsert({ user_id: currentUser.id, value, updated_at: new Date().toISOString() }, { onConflict:'user_id' });
+    if(error) throw error;
     cloudSyncStatus = 'ok';
     return true;
   }catch(e){
@@ -302,9 +321,108 @@ async function supabaseSetState(value){
   }
 }
 
+function slugifyName(name){
+  return name.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+function nameToEmail(name){
+  return `${slugifyName(name)}@ironlog.local`;
+}
+function codeToPassword(code){
+  return `il-${code}-pin`;
+}
+
+async function handleAuthSubmit(name, code){
+  if(!supabaseClient) return;
+  authError = '';
+  if(!name.trim()){ authError = 'Enter your name.'; renderAuthScreen(); return; }
+  if(!/^\d{4}$/.test(code)){ authError = 'Code must be exactly 4 digits.'; renderAuthScreen(); return; }
+  authBusy = true;
+  renderAuthScreen();
+  const email = nameToEmail(name);
+  const password = codeToPassword(code);
+  try{
+    if(authMode === 'signup'){
+      const { data, error } = await supabaseClient.auth.signUp({ email, password, options:{ data:{ display_name: name.trim() } } });
+      if(error) throw error;
+      if(data.user && !data.session){
+        authError = 'That name is taken with a different code, or signup needs confirmation — try logging in, or pick a different name.';
+        authMode = 'login';
+      }
+    } else {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+    }
+  }catch(e){
+    if(e.message && /already registered|already exists/i.test(e.message)){
+      authError = 'That name is already taken. Try logging in instead, or pick a different name.';
+    } else if(e.message && /invalid login/i.test(e.message)){
+      authError = 'Wrong name or code, or that name isn\'t signed up yet.';
+    } else {
+      authError = e.message || 'Something went wrong. Try again.';
+    }
+  }
+  authBusy = false;
+  renderAuthScreen();
+}
+async function handleLogout(){
+  if(!supabaseClient) return;
+  closeModal();
+  await supabaseClient.auth.signOut();
+}
+
+function renderAuthScreen(){
+  const app = document.getElementById('app');
+  if(!app) return;
+  app.innerHTML = `
+    <div class="auth-wrap">
+      <h1 class="auth-brand">IRON<span>LOG</span></h1>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <div class="auth-tab ${authMode==='login'?'active':''}" onclick="authMode='login'; authError=''; renderAuthScreen();">Log In</div>
+          <div class="auth-tab ${authMode==='signup'?'active':''}" onclick="authMode='signup'; authError=''; renderAuthScreen();">Sign Up</div>
+        </div>
+        <label>Your Name</label>
+        <input type="text" id="auth-name" placeholder="e.g. Taher" autocomplete="off">
+        <label>4-Digit Code</label>
+        <input type="tel" id="auth-code" placeholder="e.g. 4471" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+        ${authError ? `<div class="auth-error">${authError}</div>` : ''}
+        <button class="btn-primary auth-submit" ${authBusy?'disabled':''} onclick="handleAuthSubmit(document.getElementById('auth-name').value, document.getElementById('auth-code').value.trim())">
+          ${authBusy ? 'Please wait…' : (authMode==='signup' ? 'Create Account' : 'Log In')}
+        </button>
+      </div>
+      <div class="fab-hint">Pick any name and a 4-digit code you'll remember — that's your login. Each name keeps its own private data.</div>
+    </div>
+  `;
+}
+
 async function loadState(){
-  let loadedFromCloud = false;
   if(USE_SUPABASE){
+    if(!supabaseClient){
+      // library failed to load (e.g. offline) — fall back to local only
+    } else {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      currentUser = session ? session.user : null;
+      supabaseClient.auth.onAuthStateChange((event, session)=>{
+        const newUser = session ? session.user : null;
+        const changed = (newUser && newUser.id) !== (currentUser && currentUser.id);
+        currentUser = newUser;
+        if(changed){
+          if(currentUser){ state = {exercises:[],meals:[],logs:{},schedule:{days:{}},settings:{restSeconds:45}}; initialLoad(); }
+          else { renderAuthScreen(); }
+        }
+      });
+      if(!currentUser){
+        renderAuthScreen();
+        return;
+      }
+    }
+  }
+  await initialLoad();
+}
+
+async function initialLoad(){
+  let loadedFromCloud = false;
+  if(USE_SUPABASE && currentUser){
     const remote = await supabaseGetState();
     if(remote){ state = remote; loadedFromCloud = true; }
   }
@@ -647,6 +765,12 @@ function openManageModal(){
   let exRows = state.exercises.map(e=>`<div class="hist-row"><span>${e.name} <span style="color:var(--chalk-dim);font-size:11px">(${e.group})</span></span><span class="x" style="color:#c66;cursor:pointer;font-size:12px" onclick="deleteExercise('${e.id}')">Remove</span></div>`).join('') || '<div class="empty">No exercises yet</div>';
   let mealRows = state.meals.map(m=>`<div class="hist-row"><span>${m.name}</span><span class="x" style="color:#c66;cursor:pointer;font-size:12px" onclick="deleteMeal('${m.id}')">Remove</span></div>`).join('') || '<div class="empty">No meals yet</div>';
   div.innerHTML=`<div class="modal" style="max-height:80vh;overflow:auto;">
+    ${USE_SUPABASE && currentUser ? `
+    <h3>Account</h3>
+    <div class="user-chip">
+      <span class="email">${(currentUser.user_metadata && currentUser.user_metadata.display_name) || currentUser.email}</span>
+      <button onclick="handleLogout()">Log Out</button>
+    </div>` : ''}
     <h3>Rest Timer</h3>
     <div class="rest-setting">
       <button class="stepper-btn" onclick="adjustRestSeconds(-15); refreshManageModal();">−</button>
@@ -795,7 +919,7 @@ function renderToday(){
     <div class="section-title">Meals <button class="add-btn" onclick="openAddMealModal()">+ Add</button></div>
     ${mealCards}
     <div class="fab-hint">Send Taher's trainings and meals over anytime — they'll get added here.</div>
-    <div class="build-tag">build 2026-07-08-C</div>
+    <div class="build-tag">build 2026-07-08-F-name-code-auth</div>
   `;
 }
 
