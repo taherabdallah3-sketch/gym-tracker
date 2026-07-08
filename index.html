@@ -75,6 +75,7 @@
   .tab.active{background:var(--fire);color:#181818;box-shadow:0 2px 8px rgba(47,123,255,.35);}
 
   .day-label-banner{background:var(--steel-dim);border:1px solid var(--steel);color:var(--chalk);font-size:12.5px;font-weight:700;padding:9px 13px;border-radius:10px;margin-bottom:14px;letter-spacing:.3px;}
+  .day-label-banner.future{background:var(--plate-2);border:1px dashed var(--line);color:var(--chalk-dim);font-weight:600;}
 
   .sched-day{background:var(--plate);border:1px solid var(--line);border-radius:13px;margin-bottom:8px;overflow:hidden;}
   .sched-day summary{list-style:none;cursor:pointer;padding:13px 14px;display:flex;align-items:center;gap:10px;}
@@ -919,6 +920,7 @@ function renderToday(){
   }).join('') || (sched ? `<div class="empty">No meals scheduled for this day.</div>` : `<div class="empty">No meals yet — tap "+ Add" to log what you eat.</div>`);
 
   return `
+    ${ds > todayStr() ? `<div class="day-label-banner future">Previewing ${humanDate(ds)} — logging still works if you get ahead of schedule</div>` : ''}
     ${sched && sched.label ? `<div class="day-label-banner">${dayKey} — ${sched.label}</div>` : ''}
     <div class="rest-setting rest-setting-compact">
       <button class="stepper-btn" onclick="adjustRestSeconds(-15)">−</button>
@@ -930,7 +932,7 @@ function renderToday(){
     <div class="section-title">Meals <button class="add-btn" onclick="openAddMealModal()">+ Add</button></div>
     ${mealCards}
     <div class="fab-hint">Send Taher's trainings and meals over anytime — they'll get added here.</div>
-    <div class="build-tag">build 2026-07-08-H-navy-blue-white</div>
+    <div class="build-tag">build 2026-07-08-I-future-nav</div>
     <div class="build-tag">auth: ${authDiagnostic}</div>
   `;
 }
@@ -1012,7 +1014,7 @@ function render(){
       <div class="date-nav">
         <button onclick="shiftDate(-1)">‹</button>
         <div class="dlabel">${humanDate(ds)}</div>
-        <button onclick="shiftDate(1)" ${ds>=todayStr()?'disabled style="opacity:.3"':''}>›</button>
+        <button onclick="shiftDate(1)">›</button>
         ${USE_SUPABASE ? `<span class="sync-dot ${cloudSyncStatus}" title="${cloudSyncStatus==='ok' ? 'Synced to cloud' : cloudSyncStatus==='error' ? 'Cloud sync failed — saved locally only' : 'Connecting to cloud...'}"></span>` : ''}
         <button class="gear-btn" onclick="openManageModal()" title="Manage exercises & meals">⚙</button>
       </div>
