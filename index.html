@@ -283,10 +283,21 @@ let currentUser = null;
 let authError = '';
 let authMode = 'login'; // 'login' | 'signup'
 let authBusy = false;
+let authDiagnostic = 'not evaluated yet';
 
-if(USE_SUPABASE && window.supabase){
+if(HAS_CLAUDE_STORAGE){
+  authDiagnostic = 'Running inside Claude preview — accounts intentionally disabled here.';
+} else if(SUPABASE_ANON_KEY.startsWith('PASTE_')){
+  authDiagnostic = 'No Supabase key configured — SUPABASE_ANON_KEY is still the placeholder text.';
+} else if(typeof window.supabase === 'undefined'){
+  authDiagnostic = 'Supabase library failed to load from CDN (network/ad-blocker issue?).';
+} else if(USE_SUPABASE && window.supabase){
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  authDiagnostic = 'Supabase client created OK — checking session next.';
+} else {
+  authDiagnostic = 'USE_SUPABASE is false for an unexpected reason.';
 }
+console.log('[IronLog auth diagnostic]', authDiagnostic);
 
 async function supabaseGetState(){
   if(!supabaseClient || !currentUser) return null;
@@ -920,6 +931,7 @@ function renderToday(){
     ${mealCards}
     <div class="fab-hint">Send Taher's trainings and meals over anytime — they'll get added here.</div>
     <div class="build-tag">build 2026-07-08-F-name-code-auth</div>
+    <div class="build-tag">auth: ${authDiagnostic}</div>
   `;
 }
 
