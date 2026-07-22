@@ -168,6 +168,39 @@
   .rest-setting-val span{display:block;font-family:'Inter',sans-serif;font-size:10px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:2px;}
 
   .prog-select{width:100%;background:var(--plate);border:1px solid var(--line);color:var(--chalk);padding:11px;border-radius:10px;font-size:16px;margin-bottom:14px;}
+  /* --- training block strip --- */
+  .block-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--plate);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s;}
+  .block-strip:active{transform:scale(0.995);}
+  .block-strip:hover{border-color:var(--fire);}
+  .bs-wk{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--fire);line-height:1;}
+  .bs-day{font-size:12px;color:var(--chalk-dim);margin-top:3px;}
+  .carb-badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:6px 10px;border-radius:20px;border:1px solid var(--line);white-space:nowrap;}
+  .carb-badge.high{background:rgba(47,123,255,.18);border-color:var(--fire);color:var(--fire);}
+  .carb-badge.normal{background:rgba(143,163,196,.12);color:var(--chalk);}
+  .carb-badge.low{background:rgba(143,163,196,.08);color:var(--chalk-dim);}
+  .carb-badge.zero{background:transparent;color:var(--chalk-dim);border-style:dashed;}
+  .block-panel{background:var(--plate);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+  .block-panel summary{list-style:none;cursor:pointer;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:var(--chalk-dim);}
+  .block-panel summary::-webkit-details-marker{display:none;}
+  .block-panel summary:after{content:'▾';float:right;}
+  .block-panel[open] summary:after{content:'▴';}
+  .bp-body{padding:0 14px 14px;}
+  .bp-sub{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--chalk-dim);font-weight:700;margin:12px 0 6px;}
+  .carb-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .carb-row:last-child{border-bottom:none;}
+  .carb-amt{font-family:'JetBrains Mono',monospace;color:var(--fire);font-size:13px;}
+  .bp-note{font-size:11.5px;color:var(--chalk-dim);line-height:1.5;margin-top:8px;}
+  .meal-choices{margin-top:10px;}
+  .mc-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--fire);font-weight:700;margin-bottom:5px;}
+  .mc-items{margin-bottom:4px;}
+  .mc-or{text-align:center;font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--chalk-dim);margin:8px 0;position:relative;}
+  .mi{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;font-size:13px;border-bottom:1px solid var(--line);}
+  .mi:last-child{border-bottom:none;}
+  .mi-amt{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--chalk-dim);white-space:nowrap;}
+  .mi.carb .mi-amt{color:var(--fire);font-weight:700;}
+  .mi.carb .mi-amt s{color:var(--chalk-dim);font-weight:400;opacity:.65;margin-left:4px;}
+  .mi.off{opacity:.4;}
+  .mi.off span:first-child{text-decoration:line-through;}
   .hist-row{display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);font-size:13px;}
   .hist-row:last-child{border-bottom:none;}
   .hist-date{color:var(--chalk-dim);font-family:'JetBrains Mono',monospace;font-size:12px;}
@@ -216,6 +249,174 @@ function humanDate(ds){
   if(ds===tS) return 'Today';
   if(ds===yS) return 'Yesterday';
   return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+
+/* ============================================================
+   SAM SAMOUY PLAN — exercises and meals
+   days: {blockDay: orderWithinDay}
+   ============================================================ */
+const PLAN_VERSION = 'samouy-2026-07b';
+
+const PLAN_EXERCISES = [
+  // ---- Day 1 · Push ----
+  {id:'px_chestflymc',   name:'Chest Fly Machine',                        group:'Chest',     target:'3 × 6-12 · 30-60s rest', days:{1:1}},
+  {id:'px_inclbbpress',  name:'Incline Barbell Chest Press',              group:'Chest',     target:'3 × 6-12 · 30-60s rest', days:{1:2}},
+  {id:'px_declpressmc',  name:'Decline Chest Press Machine',              group:'Chest',     target:'3 × 6-12 · 30-60s rest', days:{1:3}},
+  {id:'px_seatedshdr',   name:'Seated Shoulder Press',                    group:'Shoulders', target:'3 × 6-12 · 30-60s rest', days:{1:4}},
+  {id:'px_dbsidelat',    name:'DB Side Laterals',                         group:'Shoulders', target:'3 × 6-12 · 30-60s rest', days:{1:5}},
+  {id:'px_cableohtri',   name:'Cable Reverse Grip One Arm Overhead',      group:'Triceps',   target:'3 × 6-12 · 30-60s rest', days:{1:6}},
+  {id:'px_revpushdown',  name:'Reverse Triceps Push Down',                group:'Triceps',   target:'3 × 6-12 · 30-60s rest', days:{1:7}},
+
+  // ---- Day 2 · Pull ----
+  {id:'px_widelatpull',  name:'Wide Lat Pull Down',                       group:'Back',      target:'4 × 6-12 · 30-60s rest', days:{2:1}},
+  {id:'px_bentoverrow',  name:'Bent Over Barbell Row Wide Grip',          group:'Back',      target:'4 × 6-12 · 30-60s rest', days:{2:2}},
+  {id:'px_onearmrow',    name:'One Arm Row Machine',                      group:'Back',      target:'4 × 6-12 · 30-60s rest', days:{2:3}},
+  {id:'px_hyperext',     name:'Hyperextension',                           group:'Back',      target:'4 × 6-12 · 30-60s rest', days:{2:4}},
+  {id:'px_reardeltfly',  name:'Rear Delt Fly Machine',                    group:'Shoulders', target:'4 × 6-12 · 30-60s rest', days:{2:5}},
+  {id:'px_dbshrugs',     name:'Dumbbell Shrugs',                          group:'Traps',     target:'4 × 6-12 · 30-60s rest', days:{2:6}},
+  {id:'px_ezcurl',       name:'EZ Biceps Curl',                           group:'Biceps',    target:'4 × 6-12 · 30-60s rest', days:{2:7}},
+
+  // ---- Day 3 · Legs ----
+  {id:'px_sglegext',     name:'Single Leg Extension',                     group:'Quads',     target:'5 × 6-12 · 30-60s rest', days:{3:1, 6:4}},
+  {id:'px_widelegpress', name:'Wide Leg Press',                           group:'Quads',     target:'4 × 6-12 · 30-60s rest', days:{3:2}},
+  {id:'px_legext',       name:'Leg Extension',                            group:'Quads',     target:'5 × 6-12 · 30-60s rest', days:{3:3}},
+  {id:'px_hipadduct',    name:'Hip Adduction',                            group:'Adductors', target:'4 × 6-12 · 30-60s rest', days:{3:4}},
+  {id:'px_sglegcurl',    name:'Single Leg Curl',                          group:'Hamstrings',target:'5 × 6-12 · 30-60s rest', days:{3:5, 6:1}},
+  {id:'px_standcalf',    name:'Standing Calf Raise Machine',              group:'Calves',    target:'5 × 6-12 · 30-60s rest', days:{3:6}},
+  {id:'px_dipslegraise', name:'Dips Leg Raises',                          group:'Abs',       target:'4 × 20 · 10s rest',      days:{3:7, 6:6}},
+  {id:'px_declinesitup', name:'Decline Sit Up',                           group:'Abs',       target:'4 × 20 · 10s rest',      days:{3:8, 6:7}},
+  {id:'px_sidecrunch',   name:'Side Crunches',                            group:'Abs',       target:'4 × 20 · 10s rest',      days:{3:9, 6:8}},
+
+  // ---- Day 5 · Upper Body ----
+  {id:'px_declcablefly', name:'Decline Standing Cable Fly',               group:'Chest',     target:'4 × 6-12 · 30-60s rest', days:{5:1}},
+  {id:'px_inclpressmc',  name:'Incline Chest Press Machine',              group:'Chest',     target:'4 × 6-12 · 30-60s rest', days:{5:2}},
+  {id:'px_cablerevfly',  name:'Cable One Arm Reverse Fly',                group:'Shoulders', target:'4 × 6-12 · 30-60s rest', days:{5:3}},
+  {id:'px_seatedwrow',   name:'Cable Seated Wide-Grip Row',               group:'Back',      target:'3 × 6-12 · 30-60s rest', days:{5:4}},
+  {id:'px_narrowlat',    name:'Narrow Grip Lat Pull Down',                group:'Back',      target:'3 × 6-12 · 30-60s rest', days:{5:5}},
+  {id:'px_dbcurl',       name:'Biceps Curl Dumbbell',                     group:'Biceps',    target:'4 × 6-12 · 30-60s rest', days:{5:6}},
+  {id:'px_ropepushdown', name:'Cable Triceps Rope Pushdown',              group:'Triceps',   target:'4 × 6-12 · 30-60s rest', days:{5:7}},
+
+  // ---- Day 6 · Lower Body ----
+  {id:'px_narrowlegpr',  name:'Narrow Leg Press',                         group:'Quads',     target:'4 × 6-12 · 30-60s rest', days:{6:2}},
+  {id:'px_lungesdb',     name:'Lunges DB',                                group:'Quads',     target:'4 × 6-12 · 30-60s rest', days:{6:3}},
+  {id:'px_seatedcalf',   name:'Seated Calf Raise Machine',                group:'Calves',    target:'5 × 6-12 · 30-60s rest', days:{6:5}}
+];
+
+// carb:true marks the one item in each choice that scales with the carb cycle.
+const PLAN_MEALS = [
+  {id:'pm_meal1', name:'Meal 1', time:'Breakfast', choices:[
+    {label:'Choice 1', items:[
+      {n:'Whole eggs', amt:2, unit:''},
+      {n:'Cottage cheese', amt:100, unit:'g'},
+      {n:'Potatoes', amt:100, unit:'g', carb:true},
+      {n:'Lettuce or bell peppers', amt:50, unit:'g'}
+    ]},
+    {label:'Choice 2', items:[
+      {n:'Light tuna (in brine)', amt:70, unit:'g'},
+      {n:'Brown toast', amt:2, unit:' slices', carb:true},
+      {n:'Almonds', amt:10, unit:'g'},
+      {n:'Lettuce or mixed bell peppers', amt:50, unit:'g'}
+    ]}
+  ]},
+  {id:'pm_meal2', name:'Meal 2', time:'Lunch', choices:[
+    {label:'Choice 1', items:[
+      {n:'Chicken breast', amt:120, unit:'g'},
+      {n:'Potatoes', amt:150, unit:'g', carb:true},
+      {n:'Green salad', amt:100, unit:'g'}
+    ]},
+    {label:'Choice 2', items:[
+      {n:'Fish', amt:140, unit:'g'},
+      {n:'Rice', amt:150, unit:'g', carb:true},
+      {n:'Sautéed vegetables', amt:100, unit:'g'}
+    ]}
+  ]},
+  {id:'pm_snack', name:'Snack', time:'Any time of day', choices:[
+    {label:'', items:[
+      {n:'Banana', amt:1, unit:'', carb:true},
+      {n:'Nuts', amt:20, unit:'g'},
+      {n:'Greek yogurt', amt:180, unit:'g'}
+    ]}
+  ]},
+  {id:'pm_pre', name:'Pre-workout', time:'30 min before training', choices:[
+    {label:'', items:[
+      {n:'Rice cakes', amt:2, unit:'', carb:true},
+      {n:'Peanut butter', amt:20, unit:'g'}
+    ]}
+  ]},
+  {id:'pm_meal3', name:'Meal 3', time:'Dinner', choices:[
+    {label:'Choice 1', items:[
+      {n:'Chicken breast', amt:120, unit:'g'},
+      {n:'Rice', amt:100, unit:'g', carb:true},
+      {n:'Green salad', amt:100, unit:'g'}
+    ]},
+    {label:'Choice 2', items:[
+      {n:'Lean beef', amt:120, unit:'g'},
+      {n:'Potatoes', amt:150, unit:'g', carb:true},
+      {n:'Sautéed vegetables', amt:100, unit:'g'}
+    ]}
+  ]}
+];
+
+// Merges the plan into whatever is already saved. Matching on name means an
+// exercise you already have keeps its id, so its logged history survives.
+function seedPlan(){
+  if(state.planVersion === PLAN_VERSION) return;
+  const norm = s => (s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+
+  const existing = {};
+  (state.exercises||[]).forEach(e=>{ existing[norm(e.name)] = e; });
+  const mergedEx = [];
+  PLAN_EXERCISES.forEach(pe=>{
+    const hit = existing[norm(pe.name)];
+    if(hit){
+      hit.group = pe.group; hit.target = pe.target; hit.days = pe.days;
+      mergedEx.push(hit);
+      delete existing[norm(pe.name)];
+    } else {
+      mergedEx.push({id:pe.id, name:pe.name, group:pe.group, target:pe.target, days:pe.days});
+    }
+  });
+  Object.values(existing).forEach(e=>{
+    // Drop anything this file seeded before that is no longer in the plan.
+    // Anything you added yourself is kept.
+    if(typeof e.id === 'string' && e.id.indexOf('px_')===0) return;
+    e.days = e.days || {};
+    mergedEx.push(e);
+  });
+  state.exercises = mergedEx;
+
+  const existingM = {};
+  (state.meals||[]).forEach(m=>{ existingM[norm(m.name)] = m; });
+  state.meals = PLAN_MEALS.map(pm=>{
+    const hit = existingM[norm(pm.name)];
+    return {id: hit ? hit.id : pm.id, name:pm.name, time:pm.time, planId:pm.id};
+  });
+
+  state.planVersion = PLAN_VERSION;
+  saveState();
+}
+
+function reloadPlan(){
+  if(!confirm('Reload the plan? This restores the training days and meals as written in your plan. Your logged sets are kept.')) return;
+  state.planVersion = null;
+  seedPlan();
+  closeModal();
+  render();
+}
+
+function planMealById(planId){ return PLAN_MEALS.find(m=>m.id===planId) || null; }
+
+// Scales the carb item in a choice by the day's multiplier.
+function renderChoice(choice, level){
+  const mult = CARB_MULT[level];
+  const lines = choice.items.map(it=>{
+    if(!it.carb) return `<div class="mi"><span>${it.n}</span><span class="mi-amt">${trimNum(it.amt)}${it.unit}</span></div>`;
+    if(level==='zero') return `<div class="mi off"><span>${it.n}</span><span class="mi-amt">cut</span></div>`;
+    const scaled = trimNum(it.amt*mult)+it.unit;
+    const changed = mult !== 1;
+    return `<div class="mi carb"><span>${it.n}</span><span class="mi-amt">${scaled}${changed?` <s>${trimNum(it.amt)}${it.unit}</s>`:''}</span></div>`;
+  }).join('');
+  return `${choice.label?`<div class="mc-label">${choice.label}</div>`:''}<div class="mc-items">${lines}</div>`;
 }
 
 const DEFAULT_EXERCISES=[
@@ -453,6 +654,7 @@ async function initialLoad(){
     saveState();
   }
   if(!state.settings){ state.settings = {restSeconds:45}; }
+  seedPlan();
   render();
 }
 async function storageGet(key){
@@ -566,6 +768,162 @@ function lastSessionFor(exId, beforeDs){
   if(!dates.length) return null;
   const d = dates[dates.length-1];
   return {date:d, sets: state.logs[d].exercises[exId].sets};
+}
+
+/* ============================================================
+   TRAINING BLOCK
+   One stored value — settings.blockStart — drives week, day,
+   carb level, cardio target and progression target.
+   ============================================================ */
+
+const BLOCK_SPLIT = ['Push','Pull','Legs','Off','Upper Body','Lower Body','Off'];
+
+// Day-by-day carb level for each week of the block.
+// Counts come straight from the plan; placement follows its own rule:
+// high carb on the hardest session (Legs), zero/low on rest days first,
+// then the lightest training day.
+const CARB_MAP = {
+  1: ['low',   'low',    'high', 'low',  'low',    'low',    'low' ],
+  2: ['normal','normal', 'high', 'zero', 'normal', 'normal', 'zero'],
+  3: ['zero',  'normal', 'high', 'zero', 'normal', 'normal', 'zero'],
+  4: ['zero',  'normal', 'high', 'zero', 'zero',   'normal', 'zero']
+};
+const CARB_MULT = { high:1.5, normal:1, low:0.5, zero:0 };
+
+// The carb item sitting in each meal, at normal-day amounts.
+const CARB_ITEMS = [
+  {meal:'Meal 1',      item:'Potatoes',   base:100, unit:'g'},
+  {meal:'Meal 2',      item:'Potatoes',   base:150, unit:'g'},
+  {meal:'Snack',       item:'Banana',     base:1,   unit:''},
+  {meal:'Pre-workout', item:'Rice cakes', base:2,   unit:''},
+  {meal:'Meal 3',      item:'Rice',       base:100, unit:'g'}
+];
+
+const BASE_MACROS = {carb:163, protein:142, fat:41, kcal:1603};
+
+const PROGRESSION = {
+  1: {scheme:'3 × 8',  weight:'same weight you finished the last block on'},
+  2: {scheme:'3 × 6',  weight:'add 2-5kg to week 1'},
+  3: {scheme:'3 × 8',  weight:'hold week 2 weight, push the reps up'},
+  4: {scheme:'3 × 6',  weight:'add 2-5kg to week 3'}
+};
+
+function blockStartStr(){
+  if(!state.settings) state.settings = {restSeconds:45};
+  if(!state.settings.blockStart){
+    state.settings.blockStart = todayStr();
+    saveState();
+  }
+  return state.settings.blockStart;
+}
+
+function daysBetween(a, b){
+  return Math.round((Date.parse(b+'T00:00:00Z') - Date.parse(a+'T00:00:00Z')) / 86400000);
+}
+
+// Wraps every 28 days, so week 4 rolls into week 1 with no action from you.
+function blockPosition(ds){
+  const diff = daysBetween(blockStartStr(), ds);
+  const n = ((diff % 28) + 28) % 28;
+  return { week: Math.floor(n/7)+1, day: (n%7)+1, cycle: Math.floor(diff/28)+1 };
+}
+
+// Selecting a week/day doesn't store the week/day — it back-solves the
+// start date. That keeps one source of truth and lets it keep advancing.
+function setBlockPosition(week, day){
+  const offset = (week-1)*7 + (day-1);
+  const d = new Date(fmt(viewDate)+'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() - offset);
+  state.settings.blockStart = d.toISOString().slice(0,10);
+  saveState();
+  closeModal();
+  render();
+}
+
+function carbLevelFor(ds){
+  const p = blockPosition(ds);
+  return CARB_MAP[p.week][p.day-1];
+}
+
+function adjustedMacros(level){
+  const carb = Math.round(BASE_MACROS.carb * CARB_MULT[level]);
+  return {
+    carb,
+    protein: BASE_MACROS.protein,
+    fat: BASE_MACROS.fat,
+    kcal: Math.round(BASE_MACROS.kcal - (BASE_MACROS.carb - carb) * 4)
+  };
+}
+
+function cardioMinutes(week){ return week <= 2 ? 20 : 30; }
+
+function trimNum(n){ return (Math.round(n*10)/10).toString(); }
+
+function openBlockModal(){
+  closeModal();
+  const p = blockPosition(fmt(viewDate));
+  const weekOpts = [1,2,3,4].map(w=>`<option value="${w}" ${w===p.week?'selected':''}>Week ${w}</option>`).join('');
+  const dayOpts = [1,2,3,4,5,6,7].map(d=>`<option value="${d}" ${d===p.day?'selected':''}>Day ${d} — ${BLOCK_SPLIT[d-1]}</option>`).join('');
+  const div=document.createElement('div');
+  div.id='modal-root'; div.className='modal-bg';
+  div.innerHTML=`<div class="modal">
+    <h3>Where are you in the block?</h3>
+    <label>Week</label>
+    <select id="blk-week" class="prog-select">${weekOpts}</select>
+    <label>Day</label>
+    <select id="blk-day" class="prog-select">${dayOpts}</select>
+    <div class="fab-hint" style="margin:0;">Set this for the day you're viewing. After that it advances on its own and rolls from week 4 straight back into week 1.</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="setBlockPosition(+document.getElementById('blk-week').value, +document.getElementById('blk-day').value)">Save</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+
+function renderBlockStrip(ds){
+  const p = blockPosition(ds);
+  const level = CARB_MAP[p.week][p.day-1];
+  return `<div class="block-strip" onclick="openBlockModal()">
+    <div>
+      <div class="bs-wk">WEEK ${p.week}</div>
+      <div class="bs-day">Day ${p.day} · ${BLOCK_SPLIT[p.day-1]}</div>
+    </div>
+    <div class="carb-badge ${level}">${level} carb</div>
+  </div>`;
+}
+
+function renderBlockPanel(ds){
+  const p = blockPosition(ds);
+  const level = CARB_MAP[p.week][p.day-1];
+  const mult = CARB_MULT[level];
+  const mac = adjustedMacros(level);
+  const prog = PROGRESSION[p.week];
+  const isRest = BLOCK_SPLIT[p.day-1] === 'Off';
+
+  const rows = CARB_ITEMS.map(c=>{
+    const amt = level==='zero' ? '—' : trimNum(c.base*mult) + c.unit;
+    return `<div class="carb-row"><span>${c.meal} · ${c.item}</span><span class="carb-amt">${amt}</span></div>`;
+  }).join('');
+
+  return `<details class="block-panel">
+    <summary>Today's targets</summary>
+    <div class="bp-body">
+      <div class="bp-sub">Food · ${level} carb day</div>
+      <div class="carb-row"><span>Carbs</span><span class="carb-amt">${mac.carb}g</span></div>
+      <div class="carb-row"><span>Protein</span><span class="carb-amt">${mac.protein}g</span></div>
+      <div class="carb-row"><span>Fat</span><span class="carb-amt">${mac.fat}g</span></div>
+      <div class="carb-row"><span>Calories</span><span class="carb-amt">${mac.kcal}</span></div>
+      <div class="bp-sub">Carb portions</div>
+      ${rows}
+      ${level==='zero' ? `<div class="bp-note">Zero carb day — protein and salad only. Everything else in your meals stays the same.</div>` : ''}
+      <div class="bp-sub">Training</div>
+      <div class="carb-row"><span>Session</span><span class="carb-amt">${BLOCK_SPLIT[p.day-1]}</span></div>
+      ${isRest ? '' : `<div class="carb-row"><span>Target scheme</span><span class="carb-amt">${prog.scheme}</span></div>
+      <div class="carb-row"><span>Cardio</span><span class="carb-amt">${cardioMinutes(p.week)} min</span></div>
+      <div class="bp-note">Week ${p.week}: ${prog.weight}. Cardio is treadmill at 7% incline, heart rate 110-130.</div>`}
+    </div>
+  </details>`;
 }
 
 let exerciseTimers = {}; // exId -> {status:'idle'|'active'|'resting', remaining, intervalId, beepNodes}
@@ -777,6 +1135,11 @@ function openManageModal(){
   let exRows = state.exercises.map(e=>`<div class="hist-row"><span>${e.name} <span style="color:var(--chalk-dim);font-size:11px">(${e.group})</span></span><span class="x" style="color:#7fb1ff;cursor:pointer;font-size:12px" onclick="deleteExercise('${e.id}')">Remove</span></div>`).join('') || '<div class="empty">No exercises yet</div>';
   let mealRows = state.meals.map(m=>`<div class="hist-row"><span>${m.name}</span><span class="x" style="color:#7fb1ff;cursor:pointer;font-size:12px" onclick="deleteMeal('${m.id}')">Remove</span></div>`).join('') || '<div class="empty">No meals yet</div>';
   div.innerHTML=`<div class="modal" style="max-height:80vh;overflow:auto;">
+    <h3>Plan</h3>
+    <div class="user-chip">
+      <span class="email">Training days &amp; meals from your plan</span>
+      <button onclick="reloadPlan()">Reload</button>
+    </div>
     ${USE_SUPABASE && currentUser ? `
     <h3>Account</h3>
     <div class="user-chip">
@@ -878,8 +1241,15 @@ function renderToday(){
   const log=getLog(ds);
   const dayKey = DAY_KEYS[viewDate.getDay()];
   const sched = getDaySchedule(dayKey);
-  const exList = sched ? state.exercises.filter(e=>sched.exercises.includes(e.id)) : state.exercises;
-  const mealList = sched ? state.meals.filter(m=>sched.meals.includes(m.id)) : state.meals;
+  const bp = blockPosition(ds);
+  const carbLevel = CARB_MAP[bp.week][bp.day-1];
+  const planForDay = state.exercises
+    .filter(e=>e.days && e.days[bp.day]!=null)
+    .sort((a,b)=>a.days[bp.day]-b.days[bp.day]);
+  const exList = planForDay.length ? planForDay
+                 : (sched ? state.exercises.filter(e=>sched.exercises.includes(e.id)) : state.exercises);
+  const mealList = state.meals.length ? state.meals
+                 : (sched ? state.meals.filter(m=>sched.meals.includes(m.id)) : state.meals);
 
   let exCards = exList.map(ex=>{
     const entry = log.exercises[ex.id] || {done:false,sets:[]};
@@ -907,6 +1277,13 @@ function renderToday(){
 
   let mealCards = mealList.map(m=>{
     const on = !!log.meals[m.id];
+    const plan = planMealById(m.planId);
+    let body = '';
+    if(plan){
+      body = `<div class="meal-choices">${plan.choices.map(c=>renderChoice(c, carbLevel)).join('<div class="mc-or">or</div>')}</div>`;
+    } else if(m.notes){
+      body = `<div class="meal-notes">${m.notes.split('\\n').map(l=>`<div>${l}</div>`).join('')}</div>`;
+    }
     return `<div class="card ${on?'done':''}">
       <div class="card-head">
         <div>
@@ -915,13 +1292,15 @@ function renderToday(){
         </div>
         <div class="check ${on?'on':''}" onclick="toggleMealDone('${m.id}')">${on?ICON_CHECK:''}</div>
       </div>
-      ${m.notes ? `<div class="meal-notes">${m.notes.split('\n').map(l=>`<div>${l}</div>`).join('')}</div>` : ''}
+      ${body}
     </div>`;
-  }).join('') || (sched ? `<div class="empty">No meals scheduled for this day.</div>` : `<div class="empty">No meals yet — tap "+ Add" to log what you eat.</div>`);
+  }).join('') || `<div class="empty">No meals yet.</div>`;
 
   return `
     ${ds > todayStr() ? `<div class="day-label-banner future">Previewing ${humanDate(ds)} — logging still works if you get ahead of schedule</div>` : ''}
     ${sched && sched.label ? `<div class="day-label-banner">${dayKey} — ${sched.label}</div>` : ''}
+    ${renderBlockStrip(ds)}
+    ${renderBlockPanel(ds)}
     <div class="rest-setting rest-setting-compact">
       <button class="stepper-btn" onclick="adjustRestSeconds(-15)">−</button>
       <div class="rest-setting-val">${formatTime(getRestSeconds())}<span>sec rest between sets</span></div>
@@ -932,7 +1311,7 @@ function renderToday(){
     <div class="section-title">Meals <button class="add-btn" onclick="openAddMealModal()">+ Add</button></div>
     ${mealCards}
     <div class="fab-hint">Send Taher's trainings and meals over anytime — they'll get added here.</div>
-    <div class="build-tag">build 2026-07-08-I-future-nav</div>
+    <div class="build-tag">build 2026-07-22-L-training-only</div>
     <div class="build-tag">auth: ${authDiagnostic}</div>
   `;
 }
